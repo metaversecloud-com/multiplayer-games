@@ -293,6 +293,8 @@ export default class WiggleServerEngine extends ServerEngine {
   }
 
   stepLogic() {
+    // TODO: possibly make more efficient by only looping through active rooms with this.rooms
+    // Can add roomName to queryObjects
     let wiggles = this.gameEngine.world.queryObjects({ instanceType: Wiggle });
     let foodObjects = this.gameEngine.world.queryObjects({ instanceType: Food });
 
