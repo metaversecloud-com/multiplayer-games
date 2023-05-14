@@ -173,6 +173,7 @@ export default class WiggleServerEngine extends ServerEngine {
         const { profileId } = wiggle;
         const { xpPerBlock, xpPerFood, xpLevelConstant } = this.gameEngine;
         let stats = await Stats.getStats({ profileId });
+        stats = stats || {};
         const { blocks, foodEaten, games } = stats;
         const blocksXP = stats && stats.blocks ? stats.blocks * xpPerBlock : 0;
         const foodEatenXP = stats && stats.foodEaten ? stats.foodEaten * xpPerFood : 0;
