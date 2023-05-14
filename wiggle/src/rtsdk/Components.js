@@ -120,7 +120,8 @@ const saveStat = async ({ User, profileId, stat }) => {
   // Check whether have access to interactive nonce, which means visitor is in world.
   try {
     const user = await User.create({ profileId });
-    const dataObject = await user.fetchUserDataObject();
+    await user.fetchUserDataObject();
+    const { dataObject } = user;
     const stats = dataObject.stats || {};
     await user.updateUserDataObject({ stats: { ...stats, stat } });
     return user;

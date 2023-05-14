@@ -99,6 +99,7 @@ export default class WiggleServerEngine extends ServerEngine {
     await VisitorInfo.updateLastVisited({ query }); // Have to do this first to make sure a data object exists on the User
 
     if (isAdmin) {
+      // TODO: Check if leaderboard or stats board is already shown and only show the appropriate
       socket.emit("isadmin"); // Shows admin controls on landing page
       socket.on("showLeaderboard", () => Leaderboard.show({ assetId, req, urlSlug }));
       socket.on("hideLeaderboard", () => Leaderboard.hide({ req }));
@@ -173,11 +174,11 @@ export default class WiggleServerEngine extends ServerEngine {
         const { xpPerBlock, xpPerFood, xpLevelConstant } = this.gameEngine;
         let stats = await Stats.getStats({ profileId });
         const { blocks, foodEaten, games } = stats;
-        const blocksXP = stats.blocks ? stats.blocks * xpPerBlock : 0;
-        const foodEatenXP = stats.foodEaten ? stats.foodEaten * xpPerFood : 0;
+        const blocksXP = stats && stats.blocks ? stats.blocks * xpPerBlock : 0;
+        const foodEatenXP = stats && stats.foodEaten ? stats.foodEaten * xpPerFood : 0;
         const XP = blocksXP + foodEatenXP;
         stats.XP = XP.toLocaleString();
-        stats.level = stats.XP ? Math.floor(xpLevelConstant * Math.sqrt(XP) + 1).toString() : "1";
+        stats.level = stats && stats.XP ? Math.floor(xpLevelConstant * Math.sqrt(XP) + 1).toString() : "1";
         stats.blocksPerGame = blocks ? (blocks / games).toFixed(1) : "-";
         stats.foodPerGame = foodEaten ? (foodEaten / games).toFixed(1) : "-";
         stats.blocks = blocks ? blocks.toLocaleString() : "-";
