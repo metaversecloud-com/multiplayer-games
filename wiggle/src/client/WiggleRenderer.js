@@ -50,19 +50,25 @@ export default class WiggleRenderer extends Renderer {
     // c += 0.005;
     // let zeroTo240 = Math.floor((Math.cos(c) + 1) * 120);
     // return `rgb(${zeroTo240},100,200)`;
-    return "Yellow";
+    return "#26580F";
   }
 
   drawWiggle(w) {
+    const playerColor = "#26580F";
+    // const nonPlayerColor = "#86DC3D";
+    const nonPlayerColor = "#398416";
+
     // draw head and body
     let isPlayer = w.playerId === this.gameEngine.playerId;
     let x = w.position.x;
     let y = w.position.y;
-    if (isPlayer) ctx.fillStyle = this.rainbowColors();
+    if (isPlayer) ctx.fillStyle = playerColor;
+    else ctx.fillStyle = nonPlayerColor;
     this.drawCircle(x, y, game.headRadius, true);
     for (let i = 0; i < w.bodyParts.length; i++) {
       let nextPos = w.bodyParts[i];
-      if (isPlayer) ctx.fillStyle = this.rainbowColors();
+      if (isPlayer) ctx.fillStyle = playerColor;
+      else ctx.fillStyle = nonPlayerColor;
       this.drawCircle(nextPos.x, nextPos.y, game.bodyRadius, true);
     }
 
@@ -79,6 +85,7 @@ export default class WiggleRenderer extends Renderer {
     this.drawCircle(eye1.x, eye1.y, game.eyeRadius, true);
     this.drawCircle(eye2.x, eye2.y, game.eyeRadius, true);
 
+    ctx.fillStyle = "white";
     ctx.font = "0.25px Arial";
     ctx.fillText(w.name, x - w.name.length / 15, y - 0.2);
     ctx.fillStyle = "white";
@@ -91,7 +98,9 @@ export default class WiggleRenderer extends Renderer {
   }
 
   drawFood(f) {
-    ctx.strokeStyle = ctx.fillStyle = "Orange";
+    // ctx.strokeStyle = ctx.fillStyle = "#DC3D86";
+    ctx.strokeStyle = ctx.fillStyle = "#841639";
+
     this.drawCircle(f.position.x, f.position.y, game.foodRadius, true);
     ctx.strokeStyle = ctx.fillStyle = "White";
   }
