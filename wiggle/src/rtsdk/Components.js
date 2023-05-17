@@ -58,7 +58,8 @@ export const StatsBoard = {
       namePrefix,
       InteractiveAsset,
       getAssetAndDataObject,
-      yOffset: -375,
+      // yOffset: -375,
+      xOffset: 550,
     }),
   hide: (props) => hideBoard({ ...props, namePrefix, World }),
   update: (props) =>
@@ -106,7 +107,7 @@ const updateLastVisited = async ({ Visitor, query }) => {
       },
     });
     if (!visitor || !visitor.username) throw "Not in world";
-    await visitor.updateVisitorDataObject({ lastVisited: Date.now() });
+    await visitor.updateDataObject({ lastVisited: Date.now() });
     return visitor;
   } catch (e) {
     // Not actually in the world.  Should prevent from seeing game.
@@ -120,10 +121,10 @@ const saveStat = async ({ User, profileId, stat }) => {
   // Check whether have access to interactive nonce, which means visitor is in world.
   try {
     const user = await User.create({ profileId });
-    await user.fetchUserDataObject();
+    await user.fetchDataObject();
     const { dataObject } = user;
     const stats = dataObject.stats || {};
-    await user.updateUserDataObject({ stats: { ...stats, stat } });
+    await user.updateDataObject({ stats: { ...stats, stat } });
     return user;
   } catch (e) {
     console.log("Error saving stat", e);
@@ -134,14 +135,14 @@ const incrementStat = async ({ User, profileId, statKey, incrementAmount }) => {
   // Check whether have access to interactive nonce, which means visitor is in world.
   try {
     const user = await User.create({ profileId });
-    // const dataObject = await user.fetchUserDataObject();
-    await user.fetchUserDataObject();
+    // const dataObject = await user.fetchDataObject();
+    await user.fetchDataObject();
     const { dataObject } = user;
     const stats = dataObject.stats || {};
     let quantity = stats[statKey] || 0;
     quantity += incrementAmount;
     stats[statKey] = quantity;
-    await user.updateUserDataObject({ stats });
+    await user.updateDataObject({ stats });
     return stats;
   } catch (e) {
     console.log("Error incrementing stat", e);
@@ -151,7 +152,7 @@ const incrementStat = async ({ User, profileId, statKey, incrementAmount }) => {
 const getStats = async ({ User, profileId }) => {
   try {
     const user = await User.create({ profileId });
-    await user.fetchUserDataObject();
+    await user.fetchDataObject();
     const { dataObject } = user;
     return dataObject.stats;
   } catch (e) {
