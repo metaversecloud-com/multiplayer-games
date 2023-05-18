@@ -11,9 +11,10 @@ export default class WiggleServerEngine extends ServerEngine {
     super(io, gameEngine, inputOptions);
     this.gameEngine.on("postStep", this.stepLogic.bind(this));
     this.scoreData = {};
-    this.aiTracker = {}; // Add AI when person is first to enter room.  Remove when last to leave.
-    this.foodTracker = {}; // Add food when person is first to enter room.  Remove when last to leave.
-    this.roomTracker = {}; // Used to add and remove AIs from used / unused worlds.
+    // this.aiTracker = {}; // Add AI when person is first to enter room.  Remove when last to leave.
+    // this.foodTracker = {}; // Add food when person is first to enter room.  Remove when last to leave.
+    // this.roomTracker = {}; // Used to generate room the first time someone comes into it.
+    this.roomPopulation = {};
     this.debounceLeaderboard = debounce(
       3000,
       (leaderboardArray, req, username) => {
@@ -53,6 +54,7 @@ export default class WiggleServerEngine extends ServerEngine {
   }
 
   generateRoom(roomName) {
+    console.log("Generating room", roomName);
     for (let f = 0; f < this.gameEngine.foodCount; f++) this.addFood(roomName);
     for (let ai = 0; ai < this.gameEngine.aiCount; ai++) this.addAI(roomName);
   }
@@ -96,9 +98,23 @@ export default class WiggleServerEngine extends ServerEngine {
     // Only update leaderboard once every 5 seconds.
 
     const { isAdmin, roomName, username, profileId } = await VisitorInfo.getRoomAndUsername({ query });
+    if (!roomName) {
+      socket.emit("notinroom");
+      return;
+    }
+    if (!this.rooms || !this.rooms[roomName]) {
+      super.createRoom(roomName);
+      this.generateRoom(roomName);
+    }
+
+    this.roomPopulation[roomName] = this.roomPopulation[roomName] || 0;
+    this.roomPopulation[roomName]++;
+
+    super.assignPlayerToRoom(socket.playerId, roomName);
     await VisitorInfo.updateLastVisited({ query }); // Have to do this first to make sure a data object exists on the User
 
     if (isAdmin) {
+      // TODO: Check if leaderboard or stats board is already shown and only show the appropriate
       socket.emit("isadmin"); // Shows admin controls on landing page
       socket.on("showLeaderboard", () => Leaderboard.show({ assetId, req, urlSlug }));
       socket.on("hideLeaderboard", () => Leaderboard.hide({ req }));
@@ -110,20 +126,6 @@ export default class WiggleServerEngine extends ServerEngine {
       socket.on("hideStatsBoard", () => StatsBoard.hide({ req }));
       // socket.on("resetLeaderboard", resetLeaderboard); // Used to reset high score.
     }
-
-    if (!roomName) {
-      socket.emit("notinroom");
-      return;
-    }
-
-    if (!this.rooms || !this.rooms[roomName]) {
-      await super.createRoom(roomName);
-    }
-
-    super.assignPlayerToRoom(socket.playerId, roomName);
-    this.roomTracker[roomName] = this.roomTracker[roomName] || 0;
-    if (this.roomTracker[roomName] === 0) this.generateRoom(roomName);
-    this.roomTracker[roomName]++;
     this.scoreData[roomName] = this.scoreData[roomName] || {};
 
     if (username === -1) {
@@ -172,12 +174,13 @@ export default class WiggleServerEngine extends ServerEngine {
         const { profileId } = wiggle;
         const { xpPerBlock, xpPerFood, xpLevelConstant } = this.gameEngine;
         let stats = await Stats.getStats({ profileId });
+        stats = stats || {};
         const { blocks, foodEaten, games } = stats;
-        const blocksXP = stats.blocks ? stats.blocks * xpPerBlock : 0;
-        const foodEatenXP = stats.foodEaten ? stats.foodEaten * xpPerFood : 0;
+        const blocksXP = stats && stats.blocks ? stats.blocks * xpPerBlock : 0;
+        const foodEatenXP = stats && stats.foodEaten ? stats.foodEaten * xpPerFood : 0;
         const XP = blocksXP + foodEatenXP;
         stats.XP = XP.toLocaleString();
-        stats.level = stats.XP ? Math.floor(xpLevelConstant * Math.sqrt(XP) + 1).toString() : "1";
+        stats.level = stats && stats.XP ? Math.floor(xpLevelConstant * Math.sqrt(XP) + 1).toString() : "1";
         stats.blocksPerGame = blocks ? (blocks / games).toFixed(1) : "-";
         stats.foodPerGame = foodEaten ? (foodEaten / games).toFixed(1) : "-";
         stats.blocks = blocks ? blocks.toLocaleString() : "-";
@@ -208,11 +211,15 @@ export default class WiggleServerEngine extends ServerEngine {
 
     if (playerWiggle) {
       console.log("Player disconnected from room", playerWiggle.roomName);
-      this.roomTracker[playerWiggle.roomName]--;
+      // this.roomTracker[playerWiggle.roomName]--;
+      // this.roomPopulation[playerWiggle.roomName]--;
       this.gameEngine.removeObjectFromWorld(playerWiggle.id);
-      if (this.roomTracker[playerWiggle.roomName] === 0) {
-        this.destroyRoom(playerWiggle.roomName);
-      }
+      // if (!this.roomPopulation[playerWiggle.roomName] || this.roomPopulation[playerWiggle.roomName] === 0) {
+      //   this.destroyRoom(playerWiggle.roomName);
+      // }
+      // if (this.roomTracker[playerWiggle.roomName] === 0) {
+      //   this.destroyRoom(playerWiggle.roomName);
+      // }
       this.updateStats(playerWiggle.roomName, playerWiggle.req);
     }
   }
@@ -222,10 +229,10 @@ export default class WiggleServerEngine extends ServerEngine {
     let playerWiggle = this.gameEngine.world.queryObject({ playerId });
     console.log("Player room", playerWiggle.roomName);
     console.log("Player left room", from);
-    this.roomTracker[from]--;
-    if (this.roomTracker[from] === 0) {
-      this.destroyRoom(from);
-    }
+    // this.roomTracker[from]--;
+    // if (this.roomTracker[from] === 0) {
+    //   this.destroyRoom(from);
+    // }
   }
 
   // Eating Food:
@@ -292,16 +299,38 @@ export default class WiggleServerEngine extends ServerEngine {
     return leaderboardArray;
   }
 
-  stepLogic() {
+  // Used to clean up rooms with no players and prevent movement
+  getRoomsWithPlayers() {
+    let roomPopulation = {};
+    for (const prop in this.connectedPlayers) {
+      console.log(prop);
+      const player = this.connectedPlayers[prop];
+      console.log("Found player in", player.roomName);
+      roomPopulation[player.roomName] = roomPopulation[player.roomName] || 0;
+      roomPopulation[player.roomName]++;
+    }
+    this.roomPopulation = roomPopulation;
+  }
+
+  stepLogic(stepObj) {
+    // TODO: possibly make more efficient by only looping through active rooms with this.rooms
+    // Can add roomName to queryObjects
     let wiggles = this.gameEngine.world.queryObjects({ instanceType: Wiggle });
     let foodObjects = this.gameEngine.world.queryObjects({ instanceType: Food });
 
+    // Check room populations every 500 ticks to prevent game logic in rooms that have no players
+    if (stepObj.step % 500 === 0) {
+      this.getRoomsWithPlayers();
+    }
+
     for (let w of wiggles) {
       // Skip if that room doesn't have anyone in it
+      if (!this.roomPopulation[w.roomName]) continue;
+
       // if (!this.roomTracker[w.roomName] || this.roomTracker[w.roomName] === 0) continue;
       // check for collision
       for (let w2 of wiggles) {
-        if (w === w2 || w.roomName !== w2.roomName) continue;
+        if (w === w2 || w.roomName !== w2.roomName) continue; // Don't have collision if in different rooms
 
         for (let i = 0; i < w2.bodyParts.length; i++) {
           let distance = w2.bodyParts[i].clone().subtract(w.position);

@@ -7,11 +7,14 @@
   "description": "An HTML5 multiplayer snakes-game based on Lance",
   "main": "src/main.js",
   "dependencies": {
+    "@babel/core": "^7.3.4",
+    "@babel/cli": "^7.19.3",
     "@babel/node": "^7.2.2",
+    "@babel/preset-env": "^7.21.5",
     "@babel/plugin-proposal-optional-chaining": "^7.21.0",
-    "@rtsdk/topia": "^0.2.2",
-    "@rtsdk/topiacomponents": "^0.0.6",
     "@rtsdk/lance-topia": "^0.0.5",
+    "@rtsdk/topia": "0.3.1",
+    "@rtsdk/topiacomponents": "^0.0.7",
     "babel-loader": "^8.0.5",
     "dotenv": "^16.0.3",
     "express": "^4.14.0",
@@ -22,14 +25,11 @@
     "webpack": "^3.8.1"
   },
   "devDependencies": {
-    "@babel/cli": "^7.19.3",
-    "@babel/core": "^7.3.4",
-    "@babel/preset-env": "^7.3.4",
     "eslint": "^4.18.2",
     "eslint-config-google": "^0.7.1"
   },
   "scripts": {
-    "start": "node dist-server/main.js",
+    "start": "npm run build && node dist-server/main.js",
     "start-debug": "node --inspect-brk dist-server/main.js",
     "start-dev": "nodemon dist-server/main.js",
     "build": "webpack && babel src --source-maps --out-dir dist-server",

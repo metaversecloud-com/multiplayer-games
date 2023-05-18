@@ -68,14 +68,12 @@ export default class WiggleClientEngine extends ClientEngine {
       });
 
       this.socket.on("inzone", () => {
-        console.log("inzone");
         document.querySelector("#spectating").className = "hidden";
         // document.querySelector("#introText").innerHTML = "You are in the Game Zone. Click Join Game to play";
         // document.querySelector("#joinGame").innerHTML = "Join Game";
       });
 
       this.socket.on("isadmin", () => {
-        console.log("Heard is admin");
         function appendHtml(el, str) {
           var div = document.createElement("button"); //container to append to
           div.innerHTML = str;

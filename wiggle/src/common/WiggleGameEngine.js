@@ -13,23 +13,30 @@ export default class WiggleGameEngine extends GameEngine {
 
     // game variables
     Object.assign(this, {
-      foodRadius: 0.1,
-      headRadius: 0.15,
-      bodyRadius: 0.1,
-      eyeDist: 0.08,
-      eyeRadius: 0.03,
-      eyeAngle: 0.5,
+      foodRadius: 0.13,
+      headRadius: 0.1,
+      // headRadius: 0.15,
+      // bodyRadius: 0.1,
+      bodyRadius: 0.2,
+      // eyeDist: 0.08,
+      eyeDist: 0.12,
+      eyeRadius: 0.05,
+      // eyeAngle: 0.5,
+      eyeAngle: 0.8,
       spaceWidth: 8,
       //   spaceWidth: 25,
       spaceHeight: 20,
       //   spaceHeight: 14,
-      moveDist: 0.06,
+      // moveDist: 0.06,
+      // moveDist: 0.045,
+      moveDist: 0.035,
       foodCount: 25,
       eatDistance: 0.3,
-      collideDistance: 0.1,
-      startBodyLength: 10,
-      aiCount: 4,
+      collideDistance: 0.2,
+      startBodyLength: 15,
+      aiCount: 3,
       directionStop: 100,
+      // directionStop: 100,
       hungerTick: 0.01,
       xpPerBlock: 100,
       xpPerFood: 1,
@@ -67,7 +74,8 @@ export default class WiggleGameEngine extends GameEngine {
         // if not stopped, move along
         if (obj.direction === this.directionStop) return;
         let move = new TwoVector(Math.cos(obj.direction), Math.sin(obj.direction));
-        move.multiplyScalar(0.05);
+        move.multiplyScalar(this.moveDist);
+        // move.multiplyScalar(0.05);
         obj.position.add(move);
         obj.position.y = Math.min(obj.position.y, this.spaceHeight / 2);
         obj.position.y = Math.max(obj.position.y, -this.spaceHeight / 2);

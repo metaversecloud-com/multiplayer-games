@@ -1,7 +1,8 @@
 FROM node:18-alpine3.17
 WORKDIR /app
 EXPOSE 3000
-ADD src .src
+ADD dist ./dist
+ADD src ./src
 COPY package.json .
 COPY babel.config.js .
 COPY webpack.config.js .
