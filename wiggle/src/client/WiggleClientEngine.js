@@ -14,8 +14,13 @@ export default class WiggleClientEngine extends ClientEngine {
     });
 
     // restart game
-    document.querySelector("#tryAgain").addEventListener("click", () => {
-      window.location.reload();
+    document.querySelector("#tryAgain").addEventListener("click", (clickEvent) => {
+      // window.location.reload();
+      this.socket.emit("requestRestart");
+      // document.querySelector("#tryAgain").disabled = true;
+      clickEvent.currentTarget.disabled = true;
+      document.querySelector("#tryAgain").className = "hidden";
+      document.body.classList.remove("lostGame");
     });
 
     this.mouseX = null;
@@ -71,6 +76,15 @@ export default class WiggleClientEngine extends ClientEngine {
         document.querySelector("#spectating").className = "hidden";
         // document.querySelector("#introText").innerHTML = "You are in the Game Zone. Click Join Game to play";
         // document.querySelector("#joinGame").innerHTML = "Join Game";
+        document.querySelector("#joinGame").className = "show";
+        document.querySelector("#joinGame").addEventListener("click", (clickEvent) => {
+          this.socket.emit("requestRestart");
+          document.querySelector("#joinGame").className = "hidden";
+          document.querySelector("#adminControls").className = "hidden";
+          document.querySelector("#instructions").className = "hidden";
+          // document.querySelector("#tryAgain").disabled = true;
+          clickEvent.currentTarget.disabled = true;
+        });
       });
 
       this.socket.on("isadmin", () => {

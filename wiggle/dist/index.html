@@ -26,13 +26,16 @@
       .textBox {
         margin: 10px 10px 0px 10px;
         display: inline-block;
+        transition: all 0.5s ease-out;
       }
       .textBox.bottomRight {
         position: absolute;
         right: 0;
         bottom: 0;
       }
-      #tryAgain {
+
+      #tryAgain,
+      #joinGame {
         font-family: "Courier", Courier, sans-serif;
         font-size: 20px;
         position: absolute;
@@ -55,6 +58,14 @@
         white-space: nowrap;
         cursor: pointer;
       }
+      #joinGame {
+        opacity: 1;
+        pointer-events: all;
+      }
+      #joinGame:disabled {
+        opacity: 0;
+        display: none;
+      }
       .lostGame #tryAgain {
         opacity: 1;
         pointer-events: all;
@@ -70,6 +81,7 @@
         opacity: 1;
         transform: translateX(-50%) translateY(-50%);
         flex-wrap: wrap;
+        transition: all 0.5s ease-out;
       }
       .adminButton {
         font-family: "Courier", Courier, sans-serif;
@@ -89,7 +101,7 @@
         cursor: pointer;
       }
       .hidden {
-        opacity: 0;
+        opacity: 0 !important;
       }
       .show {
         opacity: 1;
@@ -118,15 +130,17 @@
         position: absolute;
         /* transform: translateX(-50%) translateY(-50%); */
         left: 10;
-        top: 80;
+        top: 10;
         cursor: crosshair;
         width: 100%;
         opacity: 1;
+        transition: all 0.5s ease-out;
       }
       #instructions ul {
         font-size: 1rem;
         padding-left: 5;
         margin-top: 5;
+        list-style: none;
       }
       .animated {
         -webkit-animation-duration: 3s;
@@ -165,7 +179,7 @@
     <div id="logo" class="textBox bottomRight"></div>
     <div id="wiggle-length" class="textBox"></div>
     <div id="score" class="textBox"></div>
-    <div id="instructions" class="fadeOut animated">
+    <div id="instructions">
       Instructions
       <ul>
         <li>Eat food and block snakes to grow</li>
@@ -178,6 +192,7 @@
       Spectating
       <div>Walk into game zone to play</div>
     </div>
+    <button id="joinGame">Join Game</button>
     <button id="tryAgain" disabled>Try Again ?</button>
     <script src="bundle.js" type="text/javascript"></script>
     <div id="adminControls"></div>

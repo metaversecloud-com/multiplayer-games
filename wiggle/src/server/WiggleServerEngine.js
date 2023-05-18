@@ -137,28 +137,31 @@ export default class WiggleServerEngine extends ServerEngine {
       // socket.on("updateLeaderboard", (leaderboardArray) => debounceLeaderboard(leaderboardArray, req, username));
       socket.emit("inzone");
 
-      let player = new Wiggle(this.gameEngine, null, { position: this.gameEngine.randPos() });
-      player.direction = 0;
-      player.bodyLength = this.gameEngine.startBodyLength;
-      player.playerId = socket.playerId;
-      player.score = 0;
-      player.foodEaten = 0;
-      player.name = username;
-      player.req = req;
-      player.roomName = roomName;
-      player.profileId = profileId;
+      const makePlayerWiggle = async () => {
+        let player = new Wiggle(this.gameEngine, null, { position: this.gameEngine.randPos() });
+        player.direction = 0;
+        player.bodyLength = this.gameEngine.startBodyLength;
+        player.playerId = socket.playerId;
+        player.score = 0;
+        player.foodEaten = 0;
+        player.name = username;
+        player.req = req;
+        player.roomName = roomName;
+        player.profileId = profileId;
 
-      // player.name = nameGenerator("general");
-      this.gameEngine.addObjectToWorld(player);
-      this.assignObjectToRoom(player, roomName);
+        // player.name = nameGenerator("general");
+        this.gameEngine.addObjectToWorld(player);
+        this.assignObjectToRoom(player, roomName);
 
-      await Stats.incrementStat({ profileId, statKey: "games", incrementAmount: 1 });
-      await this.updateStats(roomName, req);
+        await Stats.incrementStat({ profileId, statKey: "games", incrementAmount: 1 });
+        await this.updateStats(roomName, req);
+      };
+
+      socket.on("requestRestart", makePlayerWiggle);
 
       // this.updateScore();
 
       // handle client restart requests
-      // socket.on("requestRestart", makePlayerShip);
     } else {
       // User is spectating because not in private zone
       socket.emit("spectating");
@@ -303,9 +306,7 @@ export default class WiggleServerEngine extends ServerEngine {
   getRoomsWithPlayers() {
     let roomPopulation = {};
     for (const prop in this.connectedPlayers) {
-      console.log(prop);
       const player = this.connectedPlayers[prop];
-      console.log("Found player in", player.roomName);
       roomPopulation[player.roomName] = roomPopulation[player.roomName] || 0;
       roomPopulation[player.roomName]++;
     }
@@ -325,7 +326,10 @@ export default class WiggleServerEngine extends ServerEngine {
 
     for (let w of wiggles) {
       // Skip if that room doesn't have anyone in it
-      if (!this.roomPopulation[w.roomName]) continue;
+      if (!this.roomPopulation[w.roomName]) {
+        console.log("Nobody in room, skipping", w.roomName);
+        continue;
+      }
 
       // if (!this.roomTracker[w.roomName] || this.roomTracker[w.roomName] === 0) continue;
       // check for collision
