@@ -10,6 +10,7 @@ export default class WiggleClientEngine extends ClientEngine {
       if (obj.playerId === gameEngine.playerId) {
         document.body.classList.add("lostGame");
         document.querySelector("#tryAgain").disabled = false;
+        document.querySelector("#tryAgain").className = "show";
       }
     });
 
