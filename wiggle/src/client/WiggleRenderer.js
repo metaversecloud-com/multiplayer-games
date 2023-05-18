@@ -46,17 +46,19 @@ export default class WiggleRenderer extends Renderer {
     ctx.restore();
   }
 
-  rainbowColors() {
-    // c += 0.005;
-    // let zeroTo240 = Math.floor((Math.cos(c) + 1) * 120);
-    // return `rgb(${zeroTo240},100,200)`;
-    return "#26580F";
-  }
+  // rainbowColors() {
+  //   // c += 0.005;
+  //   // let zeroTo240 = Math.floor((Math.cos(c) + 1) * 120);
+  //   // return `rgb(${zeroTo240},100,200)`;
+
+  // }
 
   drawWiggle(w) {
-    const playerColor = "#26580F";
+    // const playerColor = "#26580F";
+    const playerColor = "#39FF14";
     // const nonPlayerColor = "#86DC3D";
-    const nonPlayerColor = "#398416";
+    // const nonPlayerColor = "#398416";
+    const nonPlayerColor = "#2121DE";
 
     // draw head and body
     let isPlayer = w.playerId === this.gameEngine.playerId;
@@ -86,8 +88,12 @@ export default class WiggleRenderer extends Renderer {
     this.drawCircle(eye2.x, eye2.y, game.eyeRadius, true);
 
     ctx.fillStyle = "white";
-    ctx.font = "0.25px Arial";
-    ctx.fillText(w.name, x - w.name.length / 15, y - 0.2);
+    const fontSize = 0.4;
+    ctx.font = `${fontSize}px Arial`;
+
+    // ctx.fillText(w.name, x - w.name.length / 15, y - fontSize);
+    ctx.fillText(w.name, x - w.name.length / (4 / fontSize), y - 0.2);
+    // ctx.fillText(w.name, x - w.name.length * fontSize, y - 0.2);
     ctx.fillStyle = "white";
 
     // update status
@@ -99,7 +105,8 @@ export default class WiggleRenderer extends Renderer {
 
   drawFood(f) {
     // ctx.strokeStyle = ctx.fillStyle = "#DC3D86";
-    ctx.strokeStyle = ctx.fillStyle = "#841639";
+    // ctx.strokeStyle = ctx.fillStyle = "#841639";
+    ctx.strokeStyle = ctx.fillStyle = "#FD0000";
 
     this.drawCircle(f.position.x, f.position.y, game.foodRadius, true);
     ctx.strokeStyle = ctx.fillStyle = "White";
