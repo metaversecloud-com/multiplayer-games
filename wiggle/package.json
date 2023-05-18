@@ -7,6 +7,8 @@
   "description": "An HTML5 multiplayer snakes-game based on Lance",
   "main": "src/main.js",
   "dependencies": {
+    "@babel/core": "^7.3.4",
+    "@babel/cli": "^7.19.3",
     "@babel/node": "^7.2.2",
     "@babel/preset-env": "^7.21.5",
     "@babel/plugin-proposal-optional-chaining": "^7.21.0",
@@ -23,8 +25,6 @@
     "webpack": "^3.8.1"
   },
   "devDependencies": {
-    "@babel/cli": "^7.19.3",
-    "@babel/core": "^7.3.4",
     "eslint": "^4.18.2",
     "eslint-config-google": "^0.7.1"
   },
