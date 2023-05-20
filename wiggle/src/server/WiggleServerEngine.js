@@ -225,6 +225,9 @@ export default class WiggleServerEngine extends ServerEngine {
       // }
       this.updateStats(playerWiggle.roomName, playerWiggle.req);
     }
+
+    let wiggles = this.gameEngine.world.queryObjects({ instanceType: Wiggle, roomName: playerWiggle.roomName });
+    if (wiggles.length <= this.gameEngine.aiCount) this.addAI(playerWiggle.roomName);
   }
 
   // THis isn't working properly
@@ -279,7 +282,10 @@ export default class WiggleServerEngine extends ServerEngine {
   wiggleDestroyed(w) {
     if (!(w.id in this.gameEngine.world.objects)) return;
     this.gameEngine.removeObjectFromWorld(w);
-    if (w.AI) this.addAI(w.roomName);
+    let wiggles = this.gameEngine.world.queryObjects({ instanceType: Wiggle, roomName: w.roomName });
+    if (wiggles.length <= this.gameEngine.aiCount) this.addAI(w.roomName);
+
+    // if (w.AI && this.roomPopulation[w.roomName] < 3) this.addAI(w.roomName);
   }
 
   async getLeaderboardArray(roomName) {
