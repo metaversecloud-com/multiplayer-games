@@ -327,7 +327,7 @@ export default class WiggleServerEngine extends ServerEngine {
     for (let w of wiggles) {
       // Skip if that room doesn't have anyone in it
       if (!this.roomPopulation[w.roomName]) {
-        console.log("Nobody in room, skipping", w.roomName);
+        // console.log("Nobody in room, skipping", w.roomName);
         continue;
       }
 

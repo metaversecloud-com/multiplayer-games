@@ -137,10 +137,16 @@ export default class WiggleClientEngine extends ClientEngine {
         }, 250);
       });
 
-      this.socket.on("error", () => {
-        console.log("error");
-        document.querySelector("#introText").innerHTML = "There was an error loading the game.  Please try reloading";
-        document.querySelector("#joinGame").innerHTML = "<a href=.>Reload</a>";
+      this.socket.on("error", (e) => {
+        console.log("error", e);
+        // document.querySelector("#introText").innerHTML = "There was an error loading the game.  Please try reloading";
+        // document.querySelector("#joinGame").innerHTML = "<a href=.>Reload</a>";
+      });
+
+      this.socket.on("connection_error", (e) => {
+        console.log("Socket connection error", e);
+        // document.querySelector("#introText").innerHTML = "There was an error loading the game.  Please try reloading";
+        // document.querySelector("#joinGame").innerHTML = "<a href=.>Reload</a>";
       });
 
       //   this.socket.on("scoreUpdate", (e) => {
