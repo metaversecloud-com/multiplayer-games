@@ -13,7 +13,7 @@ export default class WiggleGameEngine extends GameEngine {
 
     // game variables
     Object.assign(this, {
-      foodRadius: 0.1,
+      foodRadius: 0.13,
       headRadius: 0.1,
       // headRadius: 0.15,
       // bodyRadius: 0.1,
