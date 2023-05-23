@@ -23,7 +23,7 @@ const gameEngine = new WiggleGameEngine({ traceLevel: Lib.Trace.TRACE_NONE });
 const serverEngine = new WiggleServerEngine(io, gameEngine, {
   debug: {},
   updateRate: 2,
-  fullSyncRate: 11,
+  fullSyncRate: 12,
   timeoutInterval: 600,
 });
 
