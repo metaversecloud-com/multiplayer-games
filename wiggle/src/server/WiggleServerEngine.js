@@ -251,14 +251,13 @@ export default class WiggleServerEngine extends ServerEngine {
       //   this.destroyRoom(playerWiggle.roomName);
       // }
       this.updateStats(playerWiggle.roomName, playerWiggle.req);
+      let wiggles = this.gameEngine.world.queryObjects({
+        instanceType: Wiggle,
+        roomName: playerWiggle.roomName,
+      });
+      if (wiggles.length <= this.gameEngine.aiCount)
+        this.addAI(playerWiggle.roomName);
     }
-
-    let wiggles = this.gameEngine.world.queryObjects({
-      instanceType: Wiggle,
-      roomName: playerWiggle.roomName,
-    });
-    if (wiggles.length <= this.gameEngine.aiCount)
-      this.addAI(playerWiggle.roomName);
   }
 
   // THis isn't working properly
