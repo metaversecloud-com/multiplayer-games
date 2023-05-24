@@ -1,6 +1,20 @@
 <html>
   <head>
     <title>SnakeTopia</title>
+    <!-- Google tag (gtag.js) -->
+
+    <% if (ANALYTICS_GA) { %>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=<%= ANALYTICS_GA %>"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag() {
+        dataLayer.push(arguments);
+      }
+      gtag("js", new Date());
+
+      gtag("config", "<%= ANALYTICS_GA %>");
+    </script>
+    <% } %>
     <style>
       body {
         /* background-color: CornflowerBlue; */
