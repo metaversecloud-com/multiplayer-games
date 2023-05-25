@@ -32,7 +32,9 @@ export default class WiggleServerEngine extends ServerEngine {
   }
 
   addAI(roomName) {
-    let newAI = new Wiggle(this.gameEngine, null, { position: this.gameEngine.randPos() });
+    let newAI = new Wiggle(this.gameEngine, null, {
+      position: this.gameEngine.randPos(),
+    });
     newAI.AI = true;
     newAI.direction = 0;
     newAI.turnDirection = 1;
@@ -47,7 +49,9 @@ export default class WiggleServerEngine extends ServerEngine {
   }
 
   addFood(roomName) {
-    let newF = new Food(this.gameEngine, null, { position: this.gameEngine.randPos() });
+    let newF = new Food(this.gameEngine, null, {
+      position: this.gameEngine.randPos(),
+    });
     newF.roomName = roomName;
     this.gameEngine.addObjectToWorld(newF);
     this.assignObjectToRoom(newF, roomName);
@@ -61,7 +65,9 @@ export default class WiggleServerEngine extends ServerEngine {
 
   destroyRoom(roomName) {
     let wiggles = this.gameEngine.world.queryObjects({ instanceType: Wiggle });
-    let foodObjects = this.gameEngine.world.queryObjects({ instanceType: Food });
+    let foodObjects = this.gameEngine.world.queryObjects({
+      instanceType: Food,
+    });
 
     for (let w of wiggles) {
       if (w.roomName === roomName) {
@@ -138,7 +144,9 @@ export default class WiggleServerEngine extends ServerEngine {
       socket.emit("inzone");
 
       const makePlayerWiggle = async () => {
-        let player = new Wiggle(this.gameEngine, null, { position: this.gameEngine.randPos() });
+        let player = new Wiggle(this.gameEngine, null, {
+          position: this.gameEngine.randPos(),
+        });
         player.direction = 0;
         player.bodyLength = this.gameEngine.startBodyLength;
         player.playerId = socket.playerId;
@@ -153,7 +161,11 @@ export default class WiggleServerEngine extends ServerEngine {
         this.gameEngine.addObjectToWorld(player);
         this.assignObjectToRoom(player, roomName);
 
-        await Stats.incrementStat({ profileId, statKey: "games", incrementAmount: 1 });
+        await Stats.incrementStat({
+          profileId,
+          statKey: "games",
+          incrementAmount: 1,
+        });
         await this.updateStats(roomName, req);
       };
 
@@ -170,7 +182,11 @@ export default class WiggleServerEngine extends ServerEngine {
   }
 
   async updateStats(roomName, req) {
-    let wiggles = this.gameEngine.world.queryObjects({ instanceType: Wiggle, roomName, AI: false });
+    let wiggles = this.gameEngine.world.queryObjects({
+      instanceType: Wiggle,
+      roomName,
+      AI: false,
+    });
 
     const wiggleList = await Promise.all(
       wiggles.map(async (wiggle) => {
@@ -213,21 +229,24 @@ export default class WiggleServerEngine extends ServerEngine {
     // console.log(this.connectedPlayers)
 
     if (playerWiggle) {
-      console.log("Player disconnected from room", playerWiggle.roomName);
-      // this.roomTracker[playerWiggle.roomName]--;
-      // this.roomPopulation[playerWiggle.roomName]--;
+      const { roomName } = playerWiggle;
+      console.log("Player disconnected from room", roomName);
+      // this.roomTracker[roomName]--;
+      // this.roomPopulation[roomName]--;
       this.gameEngine.removeObjectFromWorld(playerWiggle.id);
-      // if (!this.roomPopulation[playerWiggle.roomName] || this.roomPopulation[playerWiggle.roomName] === 0) {
-      //   this.destroyRoom(playerWiggle.roomName);
+      // if (!this.roomPopulation[roomName] || this.roomPopulation[roomName] === 0) {
+      //   this.destroyRoom(roomName);
       // }
-      // if (this.roomTracker[playerWiggle.roomName] === 0) {
-      //   this.destroyRoom(playerWiggle.roomName);
+      // if (this.roomTracker[roomName] === 0) {
+      //   this.destroyRoom(roomName);
       // }
-      this.updateStats(playerWiggle.roomName, playerWiggle.req);
+      this.updateStats(roomName, playerWiggle.req);
+      let wiggles = this.gameEngine.world.queryObjects({
+        instanceType: Wiggle,
+        roomName,
+      });
+      if (wiggles.length <= this.gameEngine.aiCount) this.addAI(roomName);
     }
-
-    let wiggles = this.gameEngine.world.queryObjects({ instanceType: Wiggle, roomName: playerWiggle.roomName });
-    if (wiggles.length <= this.gameEngine.aiCount) this.addAI(playerWiggle.roomName);
   }
 
   // THis isn't working properly
@@ -244,12 +263,18 @@ export default class WiggleServerEngine extends ServerEngine {
   // Eating Food:
   // increase body length, and remove the food
   wiggleEatFood(w, f) {
+    if (!f) return;
     if (!(f.id in this.gameEngine.world.objects)) return;
     this.gameEngine.removeObjectFromWorld(f);
     w.bodyLength++;
     w.foodEaten++;
-    if (!w.AI) Stats.incrementStat({ profileId: w.profileId, statKey: "foodEaten", incrementAmount: 1 });
-    this.addFood(f.roomName);
+    if (!w.AI)
+      Stats.incrementStat({
+        profileId: w.profileId,
+        statKey: "foodEaten",
+        incrementAmount: 1,
+      });
+    if (f) this.addFood(f.roomName);
     // if (f.id % 5 === 0) {
     //   // get scores of wiggles that aren't AI in f.roomName
     //   debounceLeaderboard(leaderboardArray, req, username);
@@ -274,7 +299,11 @@ export default class WiggleServerEngine extends ServerEngine {
       // Only update if both in collision are players
       const leaderboardArray = await this.getLeaderboardArray(w2.roomName);
       this.debounceLeaderboard(leaderboardArray, w2.req, w2.name);
-      Stats.incrementStat({ profileId: w2.profileId, statKey: "blocks", incrementAmount: 1 });
+      Stats.incrementStat({
+        profileId: w2.profileId,
+        statKey: "blocks",
+        incrementAmount: 1,
+      });
     }
     this.wiggleDestroyed(w1);
   }
@@ -282,14 +311,21 @@ export default class WiggleServerEngine extends ServerEngine {
   wiggleDestroyed(w) {
     if (!(w.id in this.gameEngine.world.objects)) return;
     this.gameEngine.removeObjectFromWorld(w);
-    let wiggles = this.gameEngine.world.queryObjects({ instanceType: Wiggle, roomName: w.roomName });
+    let wiggles = this.gameEngine.world.queryObjects({
+      instanceType: Wiggle,
+      roomName: w.roomName,
+    });
     if (wiggles.length <= this.gameEngine.aiCount) this.addAI(w.roomName);
 
     // if (w.AI && this.roomPopulation[w.roomName] < 3) this.addAI(w.roomName);
   }
 
   async getLeaderboardArray(roomName) {
-    let wiggles = this.gameEngine.world.queryObjects({ instanceType: Wiggle, roomName, AI: false });
+    let wiggles = this.gameEngine.world.queryObjects({
+      instanceType: Wiggle,
+      roomName,
+      AI: false,
+    });
     let leaderboardArray = wiggles
       .map((wiggle) => {
         const data = { kills: wiggle.score, name: wiggle.name };
@@ -323,7 +359,9 @@ export default class WiggleServerEngine extends ServerEngine {
     // TODO: possibly make more efficient by only looping through active rooms with this.rooms
     // Can add roomName to queryObjects
     let wiggles = this.gameEngine.world.queryObjects({ instanceType: Wiggle });
-    let foodObjects = this.gameEngine.world.queryObjects({ instanceType: Food });
+    let foodObjects = this.gameEngine.world.queryObjects({
+      instanceType: Food,
+    });
 
     // Check room populations every 500 ticks to prevent game logic in rooms that have no players
     if (stepObj.step % 500 === 0) {
