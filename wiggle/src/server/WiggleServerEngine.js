@@ -21,7 +21,7 @@ export default class WiggleServerEngine extends ServerEngine {
         console.log(`${username} updating leaderboard`, leaderboardArray);
         Leaderboard.update({ leaderboardArray, req });
       },
-      { atBegin: false }
+      { atBegin: false },
     );
   }
 
@@ -103,12 +103,7 @@ export default class WiggleServerEngine extends ServerEngine {
 
     // Only update leaderboard once every 5 seconds.
 
-    const {
-      isAdmin,
-      roomName,
-      username,
-      profileId,
-    } = await VisitorInfo.getRoomAndUsername({ query });
+    const { isAdmin, roomName, username, profileId } = await VisitorInfo.getRoomAndUsername({ query });
     if (!roomName) {
       socket.emit("notinroom");
       return;
@@ -127,9 +122,7 @@ export default class WiggleServerEngine extends ServerEngine {
     if (isAdmin) {
       // TODO: Check if leaderboard or stats board is already shown and only show the appropriate
       socket.emit("isadmin"); // Shows admin controls on landing page
-      socket.on("showLeaderboard", () =>
-        Leaderboard.show({ assetId, req, urlSlug })
-      );
+      socket.on("showLeaderboard", () => Leaderboard.show({ assetId, req, urlSlug }));
       socket.on("hideLeaderboard", () => Leaderboard.hide({ req }));
 
       socket.on("showStatsBoard", async () => {
@@ -203,21 +196,17 @@ export default class WiggleServerEngine extends ServerEngine {
         stats = stats || {};
         const { blocks, foodEaten, games } = stats;
         const blocksXP = stats && stats.blocks ? stats.blocks * xpPerBlock : 0;
-        const foodEatenXP =
-          stats && stats.foodEaten ? stats.foodEaten * xpPerFood : 0;
+        const foodEatenXP = stats && stats.foodEaten ? stats.foodEaten * xpPerFood : 0;
         const XP = blocksXP + foodEatenXP;
         stats.XP = XP.toLocaleString();
-        stats.level =
-          stats && stats.XP
-            ? Math.floor(xpLevelConstant * Math.sqrt(XP) + 1).toString()
-            : "1";
+        stats.level = stats && stats.XP ? Math.floor(xpLevelConstant * Math.sqrt(XP) + 1).toString() : "1";
         stats.blocksPerGame = blocks ? (blocks / games).toFixed(1) : "-";
         stats.foodPerGame = foodEaten ? (foodEaten / games).toFixed(1) : "-";
         stats.blocks = blocks ? blocks.toLocaleString() : "-";
         stats.foodEaten = foodEaten ? foodEaten.toLocaleString() : "-";
         stats.name = wiggle.name;
         return { id: profileId, data: stats, XP };
-      })
+      }),
     );
     const boardArray = wiggleList.sort((a, b) => {
       return b.XP - a.XP;
@@ -240,23 +229,23 @@ export default class WiggleServerEngine extends ServerEngine {
     // console.log(this.connectedPlayers)
 
     if (playerWiggle) {
-      console.log("Player disconnected from room", playerWiggle.roomName);
-      // this.roomTracker[playerWiggle.roomName]--;
-      // this.roomPopulation[playerWiggle.roomName]--;
+      const { roomName } = playerWiggle;
+      console.log("Player disconnected from room", roomName);
+      // this.roomTracker[roomName]--;
+      // this.roomPopulation[roomName]--;
       this.gameEngine.removeObjectFromWorld(playerWiggle.id);
-      // if (!this.roomPopulation[playerWiggle.roomName] || this.roomPopulation[playerWiggle.roomName] === 0) {
-      //   this.destroyRoom(playerWiggle.roomName);
+      // if (!this.roomPopulation[roomName] || this.roomPopulation[roomName] === 0) {
+      //   this.destroyRoom(roomName);
       // }
-      // if (this.roomTracker[playerWiggle.roomName] === 0) {
-      //   this.destroyRoom(playerWiggle.roomName);
+      // if (this.roomTracker[roomName] === 0) {
+      //   this.destroyRoom(roomName);
       // }
-      this.updateStats(playerWiggle.roomName, playerWiggle.req);
+      this.updateStats(roomName, playerWiggle.req);
       let wiggles = this.gameEngine.world.queryObjects({
         instanceType: Wiggle,
-        roomName: playerWiggle.roomName,
+        roomName,
       });
-      if (wiggles.length <= this.gameEngine.aiCount)
-        this.addAI(playerWiggle.roomName);
+      if (wiggles.length <= this.gameEngine.aiCount) this.addAI(roomName);
     }
   }
 
@@ -294,11 +283,7 @@ export default class WiggleServerEngine extends ServerEngine {
 
   async wiggleHitWiggle(w1, w2) {
     // w2 is the winner
-    if (
-      !(w2.id in this.gameEngine.world.objects) ||
-      !(w1.id in this.gameEngine.world.objects)
-    )
-      return;
+    if (!(w2.id in this.gameEngine.world.objects) || !(w1.id in this.gameEngine.world.objects)) return;
     if (w1.destroyed) return;
     w1.destroyed = true; // Handles race condition that happens when multiple body parts get hit
 
@@ -423,12 +408,9 @@ export default class WiggleServerEngine extends ServerEngine {
       if (w.AI) {
         if (Math.random() < 0.01) w.turnDirection *= -1;
         w.direction += (w.turnDirection * (Math.random() - 0.9)) / 20;
-        if (w.position.y >= this.gameEngine.spaceHeight / 2)
-          w.direction = -Math.PI / 2;
-        if (w.position.y <= -this.gameEngine.spaceHeight / 2)
-          w.direction = Math.PI / 2;
-        if (w.position.x >= this.gameEngine.spaceWidth / 2)
-          w.direction = Math.PI;
+        if (w.position.y >= this.gameEngine.spaceHeight / 2) w.direction = -Math.PI / 2;
+        if (w.position.y <= -this.gameEngine.spaceHeight / 2) w.direction = Math.PI / 2;
+        if (w.position.x >= this.gameEngine.spaceWidth / 2) w.direction = Math.PI;
         if (w.position.x <= -this.gameEngine.spaceWidth / 2) w.direction = 0;
         if (w.direction > Math.PI * 2) w.direction -= Math.PI * 2;
         if (w.direction < 0) w.direction += Math.PI * 2;
