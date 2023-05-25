@@ -30,7 +30,7 @@
     "eslint-config-google": "^0.7.1"
   },
   "scripts": {
-    "start": "npm run build && node dist-server/main.js",
+    "start": "node dist-server/main.js",
     "start-debug": "node --inspect-brk dist-server/main.js",
     "start-dev": "nodemon dist-server/main.js",
     "postinstall": "webpack && babel src --source-maps --out-dir dist-server",
