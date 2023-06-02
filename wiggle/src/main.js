@@ -6,16 +6,17 @@ import WiggleServerEngine from "./server/WiggleServerEngine";
 import WiggleGameEngine from "./common/WiggleGameEngine";
 
 const PORT = process.env.PORT || 3000;
-const INDEX = path.join(__dirname, "../dist/index.ejs");
+const INDEX = path.join(__dirname, "../dist/index.html");
+// const INDEX = path.join(__dirname, "../dist/index.ejs");
 
 // define routes and socket
 const server = express();
-server.set("view engine", "ejs");
+// server.set("view engine", "ejs");
 server.get("/", function (req, res) {
-  // res.sendFile(INDEX);
-  res.render(INDEX, {
-    ANALYTICS_GA: process.env.ANALYTICS_GA,
-  });
+  res.sendFile(INDEX);
+  // res.render(INDEX, {
+  //   ANALYTICS_GA: process.env.ANALYTICS_GA,
+  // });
 });
 server.use("/", express.static(path.join(__dirname, "../dist/")));
 let requestHandler = server.listen(PORT, () => console.log(`Listening on ${PORT}`));
