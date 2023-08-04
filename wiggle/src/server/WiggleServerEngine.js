@@ -119,19 +119,19 @@ export default class WiggleServerEngine extends ServerEngine {
     super.assignPlayerToRoom(socket.playerId, roomName);
     await VisitorInfo.updateLastVisited({ query }); // Have to do this first to make sure a data object exists on the User
 
-    if (isAdmin) {
-      // TODO: Check if leaderboard or stats board is already shown and only show the appropriate
-      socket.emit("isadmin"); // Shows admin controls on landing page
-      socket.on("showLeaderboard", () => Leaderboard.show({ assetId, req, urlSlug }));
-      socket.on("hideLeaderboard", () => Leaderboard.hide({ req }));
+    // if (isAdmin) {
+    //   // TODO: Check if leaderboard or stats board is already shown and only show the appropriate
+    //   socket.emit("isadmin"); // Shows admin controls on landing page
+    //   socket.on("showLeaderboard", () => Leaderboard.show({ assetId, req, urlSlug }));
+    //   socket.on("hideLeaderboard", () => Leaderboard.hide({ req }));
 
-      socket.on("showStatsBoard", async () => {
-        await StatsBoard.show({ assetId, req, urlSlug });
-        setTimeout(() => this.updateStats(roomName, req), 3000);
-      });
-      socket.on("hideStatsBoard", () => StatsBoard.hide({ req }));
-      // socket.on("resetLeaderboard", resetLeaderboard); // Used to reset high score.
-    }
+    //   socket.on("showStatsBoard", async () => {
+    //     await StatsBoard.show({ assetId, req, urlSlug });
+    //     setTimeout(() => this.updateStats(roomName, req), 3000);
+    //   });
+    //   socket.on("hideStatsBoard", () => StatsBoard.hide({ req }));
+    //   // socket.on("resetLeaderboard", resetLeaderboard); // Used to reset high score.
+    // }
     this.scoreData[roomName] = this.scoreData[roomName] || {};
 
     if (username === -1) {
