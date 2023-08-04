@@ -205,6 +205,14 @@ export default class WiggleServerEngine extends ServerEngine {
         stats.blocks = blocks ? blocks.toLocaleString() : "-";
         stats.foodEaten = foodEaten ? foodEaten.toLocaleString() : "-";
         stats.name = wiggle.name;
+
+        // Set Wiggle player's persistent Stats to display in frontend
+        wiggle.stat_XP = stats.XP;
+        wiggle.stat_level = stats.level;
+        wiggle.stat_blocks = stats.blocks;
+        wiggle.stat_blocksPerGame = stats.blocksPerGame;
+        wiggle.stat_foodPerGame = stats.foodPerGame;
+
         return { id: profileId, data: stats, XP };
       }),
     );
