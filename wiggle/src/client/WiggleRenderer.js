@@ -92,14 +92,23 @@ export default class WiggleRenderer extends Renderer {
     ctx.font = `${fontSize}px Arial`;
 
     // ctx.fillText(w.name, x - w.name.length / 15, y - fontSize);
-    ctx.fillText(w.name, x - w.name.length / (4 / fontSize), y - 0.2);
+    let textToFill = w.stat_level ? w.name + " - lvl " + w.stat_level : w.name;
+    ctx.fillText(textToFill, x - textToFill.length / (4 / fontSize), y - 0.2);
     // ctx.fillText(w.name, x - w.name.length * fontSize, y - 0.2);
     ctx.fillStyle = "white";
 
     // update status
     if (isPlayer) {
+      const xp = w.stat_XP ? w.stat_XP : "";
+      const level = w.stat_level ? w.stat_level : "";
+      const blocks = w.stat_blocks ? w.stat_blocks : "";
+      const blocksPerGame = w.stat_blocksPerGame ? w.stat_blocksPerGame : "";
       document.getElementById("wiggle-length").innerHTML = "Your Length: " + w.bodyParts.length;
       document.getElementById("score").innerHTML = "Your Score: " + w.score;
+      document.getElementById("xp").innerHTML = "XP: " + xp;
+      document.getElementById("level").innerHTML = "Level: " + level;
+      document.getElementById("blocks").innerHTML = "Blocks: " + blocks;
+      document.getElementById("blocksPerGame").innerHTML = "Per Game: " + blocksPerGame;
     }
   }
 
