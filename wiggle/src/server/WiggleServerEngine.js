@@ -64,6 +64,7 @@ export default class WiggleServerEngine extends ServerEngine {
   }
 
   destroyRoom(roomName) {
+    console.log("Destroying room");
     let wiggles = this.gameEngine.world.queryObjects({ instanceType: Wiggle });
     let foodObjects = this.gameEngine.world.queryObjects({
       instanceType: Food,
@@ -82,6 +83,7 @@ export default class WiggleServerEngine extends ServerEngine {
         this.gameEngine.removeObjectFromWorld(f);
       }
     }
+    delete this.rooms[roomName];
   }
 
   onPlayerConnected(socket) {
@@ -360,6 +362,10 @@ export default class WiggleServerEngine extends ServerEngine {
       roomPopulation[player.roomName] = roomPopulation[player.roomName] || 0;
       roomPopulation[player.roomName]++;
     }
+    // Destroy all rooms that don't currently have players
+    for (var roomName in this.roomPopulation) {
+      if (!roomPopulation[roomName]) this.destroyRoom(roomName);
+    }
     this.roomPopulation = roomPopulation;
   }
 
@@ -378,7 +384,7 @@ export default class WiggleServerEngine extends ServerEngine {
 
     for (let w of wiggles) {
       // Skip if that room doesn't have anyone in it
-      if (!this.roomPopulation[w.roomName]) {
+      if (!this.roomPopulation[w.roomName] || !this.rooms[w.roomName]) {
         // console.log("Nobody in room, skipping", w.roomName);
         continue;
       }
