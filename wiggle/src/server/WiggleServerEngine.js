@@ -218,11 +218,11 @@ export default class WiggleServerEngine extends ServerEngine {
         return { id: profileId, data: stats, XP };
       }),
     );
-    const boardArray = wiggleList.sort((a, b) => {
-      return b.XP - a.XP;
-    });
+    // const boardArray = wiggleList.sort((a, b) => {
+    //   return b.XP - a.XP;
+    // });
 
-    StatsBoard.update({ boardArray, req });
+    // StatsBoard.update({ boardArray, req });
 
     // console.log(wiggleList);
 
