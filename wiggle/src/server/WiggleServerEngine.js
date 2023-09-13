@@ -64,6 +64,7 @@ export default class WiggleServerEngine extends ServerEngine {
   }
 
   destroyRoom(roomName) {
+    console.log("Destroying room");
     let wiggles = this.gameEngine.world.queryObjects({ instanceType: Wiggle });
     let foodObjects = this.gameEngine.world.queryObjects({
       instanceType: Food,
@@ -82,6 +83,7 @@ export default class WiggleServerEngine extends ServerEngine {
         this.gameEngine.removeObjectFromWorld(f);
       }
     }
+    delete this.rooms[roomName];
   }
 
   onPlayerConnected(socket) {
@@ -119,19 +121,19 @@ export default class WiggleServerEngine extends ServerEngine {
     super.assignPlayerToRoom(socket.playerId, roomName);
     await VisitorInfo.updateLastVisited({ query }); // Have to do this first to make sure a data object exists on the User
 
-    if (isAdmin) {
-      // TODO: Check if leaderboard or stats board is already shown and only show the appropriate
-      socket.emit("isadmin"); // Shows admin controls on landing page
-      socket.on("showLeaderboard", () => Leaderboard.show({ assetId, req, urlSlug }));
-      socket.on("hideLeaderboard", () => Leaderboard.hide({ req }));
+    // if (isAdmin) {
+    //   // TODO: Check if leaderboard or stats board is already shown and only show the appropriate
+    //   socket.emit("isadmin"); // Shows admin controls on landing page
+    //   socket.on("showLeaderboard", () => Leaderboard.show({ assetId, req, urlSlug }));
+    //   socket.on("hideLeaderboard", () => Leaderboard.hide({ req }));
 
-      socket.on("showStatsBoard", async () => {
-        await StatsBoard.show({ assetId, req, urlSlug });
-        setTimeout(() => this.updateStats(roomName, req), 3000);
-      });
-      socket.on("hideStatsBoard", () => StatsBoard.hide({ req }));
-      // socket.on("resetLeaderboard", resetLeaderboard); // Used to reset high score.
-    }
+    //   socket.on("showStatsBoard", async () => {
+    //     await StatsBoard.show({ assetId, req, urlSlug });
+    //     setTimeout(() => this.updateStats(roomName, req), 3000);
+    //   });
+    //   socket.on("hideStatsBoard", () => StatsBoard.hide({ req }));
+    //   // socket.on("resetLeaderboard", resetLeaderboard); // Used to reset high score.
+    // }
     this.scoreData[roomName] = this.scoreData[roomName] || {};
 
     if (username === -1) {
@@ -205,14 +207,22 @@ export default class WiggleServerEngine extends ServerEngine {
         stats.blocks = blocks ? blocks.toLocaleString() : "-";
         stats.foodEaten = foodEaten ? foodEaten.toLocaleString() : "-";
         stats.name = wiggle.name;
+
+        // Set Wiggle player's persistent Stats to display in frontend
+        wiggle.stat_XP = stats.XP;
+        wiggle.stat_level = stats.level;
+        wiggle.stat_blocks = stats.blocks;
+        wiggle.stat_blocksPerGame = stats.blocksPerGame;
+        wiggle.stat_foodPerGame = stats.foodPerGame;
+
         return { id: profileId, data: stats, XP };
       }),
     );
-    const boardArray = wiggleList.sort((a, b) => {
-      return b.XP - a.XP;
-    });
+    // const boardArray = wiggleList.sort((a, b) => {
+    //   return b.XP - a.XP;
+    // });
 
-    StatsBoard.update({ boardArray, req });
+    // StatsBoard.update({ boardArray, req });
 
     // console.log(wiggleList);
 
@@ -352,6 +362,10 @@ export default class WiggleServerEngine extends ServerEngine {
       roomPopulation[player.roomName] = roomPopulation[player.roomName] || 0;
       roomPopulation[player.roomName]++;
     }
+    // Destroy all rooms that don't currently have players
+    for (var roomName in this.roomPopulation) {
+      if (!roomPopulation[roomName]) this.destroyRoom(roomName);
+    }
     this.roomPopulation = roomPopulation;
   }
 
@@ -370,7 +384,7 @@ export default class WiggleServerEngine extends ServerEngine {
 
     for (let w of wiggles) {
       // Skip if that room doesn't have anyone in it
-      if (!this.roomPopulation[w.roomName]) {
+      if (!this.roomPopulation[w.roomName] || !this.rooms[w.roomName]) {
         // console.log("Nobody in room, skipping", w.roomName);
         continue;
       }

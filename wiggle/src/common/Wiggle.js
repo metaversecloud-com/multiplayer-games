@@ -8,6 +8,11 @@ export default class Wiggle extends DynamicObject {
         bodyLength: { type: BaseTypes.TYPES.INT16 },
         score: { type: BaseTypes.TYPES.INT16 },
         name: { type: BaseTypes.TYPES.STRING },
+        stat_XP: { type: BaseTypes.TYPES.STRING },
+        stat_level: { type: BaseTypes.TYPES.STRING },
+        stat_blocks: { type: BaseTypes.TYPES.STRING },
+        stat_blocksPerGame: { type: BaseTypes.TYPES.STRING },
+        stat_foodPerGame: { type: BaseTypes.TYPES.STRING },
       },
       super.netScheme,
     );
@@ -18,6 +23,11 @@ export default class Wiggle extends DynamicObject {
     this.class = Wiggle;
     this.bodyParts = [];
     this.score = 0;
+    this.stat_XP = "";
+    this.stat_level = "";
+    this.stat_blocks = "";
+    this.stat_blocksPerGame = "";
+    this.stat_foodPerGame = "";
   }
 
   syncTo(other) {
@@ -26,6 +36,11 @@ export default class Wiggle extends DynamicObject {
     this.bodyLength = other.bodyLength;
     this.name = other.name;
     this.score = other.score;
+    this.stat_XP = other.stat_XP;
+    this.stat_level = other.stat_level;
+    this.stat_blocks = other.stat_blocks;
+    this.stat_blocksPerGame = other.stat_blocksPerGame;
+    this.stat_foodPerGame = other.stat_foodPerGame;
   }
 
   toString() {
