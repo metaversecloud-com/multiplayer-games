@@ -1,5 +1,6 @@
 import { ClientEngine } from "@rtsdk/lance-topia";
 import WiggleRenderer from "../client/WiggleRenderer";
+import LeaderboardItem from "../common/LeaderboardItem";
 
 export default class WiggleClientEngine extends ClientEngine {
   constructor(gameEngine, options) {
@@ -11,6 +12,8 @@ export default class WiggleClientEngine extends ClientEngine {
         document.body.classList.add("lostGame");
         document.querySelector("#tryAgain").disabled = false;
         document.querySelector("#tryAgain").className = "show";
+
+        document.querySelector("#leaderboardTable").className = "show";
       }
     });
 
@@ -21,6 +24,7 @@ export default class WiggleClientEngine extends ClientEngine {
       // document.querySelector("#tryAgain").disabled = true;
       clickEvent.currentTarget.disabled = true;
       document.querySelector("#tryAgain").className = "hidden";
+      document.querySelector("#leaderboardTable").className = "hidden";
       document.body.classList.remove("lostGame");
     });
 
@@ -83,6 +87,7 @@ export default class WiggleClientEngine extends ClientEngine {
           document.querySelector("#joinGame").className = "hidden";
           document.querySelector("#adminControls").className = "hidden";
           document.querySelector("#instructions").className = "hidden";
+          document.querySelector("#leaderboardTable").className = "hidden";
           // document.querySelector("#tryAgain").disabled = true;
           clickEvent.currentTarget.disabled = true;
         });

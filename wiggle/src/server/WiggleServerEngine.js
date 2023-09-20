@@ -15,13 +15,15 @@ export default class WiggleServerEngine extends ServerEngine {
     // this.foodTracker = {}; // Add food when person is first to enter room.  Remove when last to leave.
     // this.roomTracker = {}; // Used to generate room the first time someone comes into it.
     this.roomPopulation = {};
+    this.leaderboardAllTimeByRoom = {};
     this.debounceLeaderboard = debounce(
-      3000,
+      500,
       (leaderboardArray, req, username) => {
         console.log(`${username} updating leaderboard`, leaderboardArray);
-        Leaderboard.update({ leaderboardArray, req });
+        updateInAppLeaderboard({ leaderboardArray, req });
+        // Leaderboard.update({ leaderboardArray, req });
       },
-      { atBegin: false },
+      { atBegin: true },
     );
   }
 
@@ -308,12 +310,14 @@ export default class WiggleServerEngine extends ServerEngine {
       // if (!w2.AI) {
       // Only update if both in collision are players
       const leaderboardArray = await this.getLeaderboardArray(w2.roomName);
-      this.debounceLeaderboard(leaderboardArray, w2.req, w2.name);
+
+      // this.debounceLeaderboard(leaderboardArray, w2.req, w2.name);
       Stats.incrementStat({
         profileId: w2.profileId,
         statKey: "blocks",
         incrementAmount: 1,
       });
+      this.leaderboardAllTimeByRoom[w2.roomName] = await updateInAppLeaderboard({ leaderboardArray, req });
     }
     this.wiggleDestroyed(w1);
   }

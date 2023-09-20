@@ -39,7 +39,7 @@ export default class WiggleRenderer extends Renderer {
 
     // Draw all things
     game.world.forEachObject((id, obj) => {
-      if (obj instanceof Wiggle) this.drawWiggle(obj);
+      if (obj instanceof Wiggle) this.drawWiggle(obj, t);
       else if (obj instanceof Food) this.drawFood(obj);
     });
 
@@ -53,7 +53,7 @@ export default class WiggleRenderer extends Renderer {
 
   // }
 
-  drawWiggle(w) {
+  drawWiggle(w, time) {
     // const playerColor = "#26580F";
     const playerColor = "#39FF14";
     // const nonPlayerColor = "#86DC3D";
@@ -98,7 +98,9 @@ export default class WiggleRenderer extends Renderer {
     ctx.fillStyle = "white";
 
     // update status
-    if (isPlayer) {
+    const timeInt = parseInt(time);
+    // Only update DOM on every 18th or so draw
+    if (isPlayer && timeInt % 18 === 0) {
       const xp = w.stat_XP ? w.stat_XP : "";
       const level = w.stat_level ? w.stat_level : "";
       const blocks = w.stat_blocks ? w.stat_blocks : "";
