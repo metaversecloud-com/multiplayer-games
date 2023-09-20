@@ -29,6 +29,19 @@
       Spectating
       <div>Walk into game zone to play</div>
     </div>
+    <table id="leaderboardTable" class="hidden">
+      <thead>
+        <tr>
+          <th class="leaderboardTitle" colspan="3">Top Scores</th>
+        </tr>
+        <tr>
+          <th class="leaderboardColumn1" colspan="1">Name</th>
+          <th class="leaderboardColumn2" colspan="1">Score</th>
+          <th class="leaderboardColumn2" colspan="1">When</th>
+        </tr>
+      </thead>
+      <tbody id="leaderboardBody"></tbody>
+    </table>
     <button id="joinGame" class="hidden">Join Game</button>
     <button id="tryAgain" disabled>Try Again ?</button>
     <script src="bundle.js" type="text/javascript"></script>
