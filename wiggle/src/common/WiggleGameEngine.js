@@ -1,7 +1,6 @@
 import { GameEngine, SimplePhysicsEngine, TwoVector } from "@rtsdk/lance-topia";
 import Wiggle from "./Wiggle";
 import Food from "./Food";
-import LeaderboardItem from "./LeaderboardItem";
 
 export default class WiggleGameEngine extends GameEngine {
   constructor(options) {
@@ -48,7 +47,6 @@ export default class WiggleGameEngine extends GameEngine {
   registerClasses(serializer) {
     serializer.registerClass(Wiggle);
     serializer.registerClass(Food);
-    serializer.registerClass(LeaderboardItem);
   }
 
   start() {

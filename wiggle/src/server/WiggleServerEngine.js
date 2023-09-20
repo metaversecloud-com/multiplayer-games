@@ -3,7 +3,8 @@ import { debounce } from "throttle-debounce";
 import url from "url";
 import Wiggle from "../common/Wiggle";
 import Food from "../common/Food";
-import { Leaderboard, VisitorInfo, Stats, StatsBoard } from "../rtsdk";
+import { VisitorInfo, Stats } from "../rtsdk";
+import { updateInAppLeaderboard } from "../rtsdk/leaderboard";
 const nameGenerator = require("./NameGenerator");
 
 export default class WiggleServerEngine extends ServerEngine {
@@ -100,6 +101,15 @@ export default class WiggleServerEngine extends ServerEngine {
     const { assetId, urlSlug } = query;
     const req = { body: query }; // Used for interactive assets
 
+    socket.on("requestLeaderboard", async (roomName) => {
+      if (!this.leaderboardAllTimeByRoom[roomName]) {
+        const leaderboardArray = await this.getLeaderboardArray(roomName);
+        this.leaderboardAllTimeByRoom[roomName] = await updateInAppLeaderboard({ leaderboardArray, req });
+      }
+
+      return socket.emit("leaderboardUpdated", this.leaderboardAllTimeByRoom[roomName]);
+    });
+
     // const gameStatus = this.gameStatus();
     // const rooms = this.rooms;
     // console.log("Game Status", gameStatus);
@@ -121,6 +131,7 @@ export default class WiggleServerEngine extends ServerEngine {
     this.roomPopulation[roomName]++;
 
     super.assignPlayerToRoom(socket.playerId, roomName);
+
     await VisitorInfo.updateLastVisited({ query }); // Have to do this first to make sure a data object exists on the User
 
     // if (isAdmin) {
@@ -317,7 +328,7 @@ export default class WiggleServerEngine extends ServerEngine {
         statKey: "blocks",
         incrementAmount: 1,
       });
-      this.leaderboardAllTimeByRoom[w2.roomName] = await updateInAppLeaderboard({ leaderboardArray, req });
+      this.leaderboardAllTimeByRoom[w2.roomName] = await updateInAppLeaderboard({ leaderboardArray, req: w2.req });
     }
     this.wiggleDestroyed(w1);
   }
