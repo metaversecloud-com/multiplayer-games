@@ -203,3 +203,34 @@ canvas {
   -webkit-animation-name: fadeOut;
   animation-name: fadeOut;
 }
+
+#leaderboardTable {
+  position: absolute;
+  transform: translateX(-50%) translateY(0%);
+  left: 50%;
+  top: 15%;
+  width: 90%;
+  padding-top: 30px;
+  cursor: crosshair;
+  transition: all 0.5s ease-out;
+}
+
+.leaderboardTitle {
+  font-size: 1.17em;
+}
+
+#leaderboardBody {
+  font-size: 14px;
+}
+
+.leaderboardColumn1 {
+  text-align: left;
+}
+
+.leaderboardColumn2 {
+  text-align: center;
+}
+
+.leaderboardColumn3 {
+  text-align: right;
+}

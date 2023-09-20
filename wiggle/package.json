@@ -20,6 +20,7 @@
     "ejs": "^3.1.6",
     "express": "^4.14.0",
     "lance-gg": "^4.0.3",
+    "moment": "^2.29.4",
     "query-string": "^4.2.3",
     "socket.io": "^4.6.1",
     "throttle-debounce": "^5.0.0",

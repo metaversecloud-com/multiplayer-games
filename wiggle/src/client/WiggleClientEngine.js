@@ -1,16 +1,32 @@
+import moment from "moment";
 import { ClientEngine } from "@rtsdk/lance-topia";
 import WiggleRenderer from "../client/WiggleRenderer";
 
+function appendHtml(el, str) {
+  var div = document.createElement("button"); //container to append to
+  div.innerHTML = str;
+  while (div.children.length > 0) {
+    el.appendChild(div.children[0]);
+  }
+}
 export default class WiggleClientEngine extends ClientEngine {
   constructor(gameEngine, options) {
     super(gameEngine, options, WiggleRenderer);
 
+    const params = new Proxy(new URLSearchParams(window.location.search), {
+      get: (searchParams, prop) => searchParams.get(prop),
+    });
+    this.roomName = params["assetId"];
+
     // show try-again button
     gameEngine.on("objectDestroyed", (obj) => {
+      // this.updateLeaderboard();
       if (obj.playerId === gameEngine.playerId) {
         document.body.classList.add("lostGame");
         document.querySelector("#tryAgain").disabled = false;
         document.querySelector("#tryAgain").className = "show";
+
+        this.socket.emit("requestLeaderboard", this.roomName);
       }
     });
 
@@ -21,6 +37,7 @@ export default class WiggleClientEngine extends ClientEngine {
       // document.querySelector("#tryAgain").disabled = true;
       clickEvent.currentTarget.disabled = true;
       document.querySelector("#tryAgain").className = "hidden";
+      document.querySelector("#leaderboardTable").className = "hidden";
       document.body.classList.remove("lostGame");
     });
 
@@ -32,6 +49,32 @@ export default class WiggleClientEngine extends ClientEngine {
     document.addEventListener("touchmove", this.updateMouseXY.bind(this), false);
     document.addEventListener("touchenter", this.updateMouseXY.bind(this), false);
     this.gameEngine.on("client__preStep", this.sendMouseAngle.bind(this));
+  }
+
+  updateLeaderboard(data) {
+    document.querySelector("#leaderboardBody").innerHTML = "";
+    // id, score, name, date;
+    console.log("Leaderboard DATA", data);
+    if (!data) return;
+    let leaderboardRows = "";
+    for (let i = 0; i < data.length; i++) {
+      if (i > 10) return;
+      const date = data[i].date;
+      const name = data[i].name;
+      const score = data[i].score;
+      const when = moment(date).fromNow();
+
+      if (date && name && score) {
+        leaderboardRows += `<tr class="leaderboardRow" id=${date}>
+          <td class="leaderboardColumn1">${name}</td>
+          <td class="leaderboardColumn2">${score}</td>
+          <td class="leaderboardColumn3">${when}</td>
+        </tr>`;
+      }
+    }
+
+    document.querySelector("#leaderboardBody").innerHTML = leaderboardRows;
+    document.querySelector("#leaderboardTable").className = "show";
   }
 
   updateMouseXY(e) {
@@ -60,6 +103,9 @@ export default class WiggleClientEngine extends ClientEngine {
 
   connect() {
     return super.connect().then(() => {
+      this.socket.on("leaderboardUpdated", this.updateLeaderboard);
+      this.socket.emit("requestLeaderboard", this.roomName);
+
       this.socket.on("spectating", () => {
         console.log("spectating");
         document.querySelector("#spectating").className = "showOpaque";
@@ -83,19 +129,13 @@ export default class WiggleClientEngine extends ClientEngine {
           document.querySelector("#joinGame").className = "hidden";
           document.querySelector("#adminControls").className = "hidden";
           document.querySelector("#instructions").className = "hidden";
+          document.querySelector("#leaderboardTable").className = "hidden";
           // document.querySelector("#tryAgain").disabled = true;
           clickEvent.currentTarget.disabled = true;
         });
       });
 
       this.socket.on("isadmin", () => {
-        function appendHtml(el, str) {
-          var div = document.createElement("button"); //container to append to
-          div.innerHTML = str;
-          while (div.children.length > 0) {
-            el.appendChild(div.children[0]);
-          }
-        }
         appendHtml(
           document.querySelector("#adminControls"),
           "<button id='showLeaderboard' class='adminButton'>Show Scores</button>",
