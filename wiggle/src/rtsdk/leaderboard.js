@@ -18,7 +18,7 @@ export const updateInAppLeaderboard = async ({ leaderboardArray, req }) => {
       const score = leaderboardArray[i].data.kills;
       const id = leaderboardArray[i].id;
       name = leaderboardArray[i].data.name;
-      sanitizedArray.push({ id, score, name, date });
+      if (id && score && name && date) sanitizedArray.push({ id, score, name, date });
     }
   }
 
@@ -32,9 +32,19 @@ export const updateHighScores = async ({ req, sanitizedArray }) => {
   const { dataObject } = arcadeAsset;
   const { highScores } = dataObject;
 
-  // Don't update high score if the lowest high score is higher than the top current score.
-  if (highScores && highScores[2] && sanitizedArray && sanitizedArray[0].score < highScores[2].score) return highScores;
+  if (!sanitizedArray.length) return highScores;
 
+  // Don't update high score if the lowest high score is higher than the top current score.
+  if (
+    highScores &&
+    highScores[2] &&
+    sanitizedArray &&
+    sanitizedArray[0] &&
+    sanitizedArray[0].score < highScores[2].score
+  )
+    return highScores;
+
+  // This is to compare high score array to current scores array and update high scores if necessary.
   let newArray = highScores ? sanitizedArray.concat(highScores) : sanitizedArray;
   let sortedArray = newArray.sort((a, b) => {
     return b.score - a.score;
