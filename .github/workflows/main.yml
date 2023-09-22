@@ -53,3 +53,5 @@ jobs:
           aws ecs update-service --service $IMAGE_TAG5-svc --force-new-deployment --cluster SDK-Example-CLS
           aws ecs update-service --service $IMAGE_TAG6-svc --force-new-deployment --cluster SDK-Example-CLS
           aws ecs update-service --service $IMAGE_TAG7-svc --force-new-deployment --cluster SDK-Example-CLS
+          aws ecs update-service --service $IMAGE_TAG-topia1-svc --force-new-deployment --cluster SDK-Example-CLS
+          aws ecs update-service --service $IMAGE_TAG-topia2-svc --force-new-deployment --cluster SDK-Example-CLS
