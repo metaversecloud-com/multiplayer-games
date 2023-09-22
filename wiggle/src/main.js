@@ -24,7 +24,7 @@ const io = socketIO(requestHandler);
 
 // Game Instances
 // const gameEngine = new WiggleGameEngine({ traceLevel: 1 });
-const gameEngine = new WiggleGameEngine({ traceLevel: Lib.Trace.TRACE_NONE });
+const gameEngine = new WiggleGameEngine({ traceLevel: Lib.Trace.TRACE_ALL });
 const serverEngine = new WiggleServerEngine(io, gameEngine, {
   debug: {},
   updateRate: 2,
