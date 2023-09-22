@@ -15,7 +15,7 @@ export const getDroppedAsset = async (req) => {
     });
     return droppedAsset;
   } catch (e) {
-    console.log("Error getting asset and data object", e);
+    console.log("Error getting dropped asset", e);
   }
 };
 
