@@ -47,3 +47,9 @@ jobs:
       - name: Publish
         run: |
           aws ecs update-service --service $IMAGE_TAG-svc --force-new-deployment --cluster SDK-Example-CLS
+          aws ecs update-service --service $IMAGE_TAG2-svc --force-new-deployment --cluster SDK-Example-CLS
+          aws ecs update-service --service $IMAGE_TAG3-svc --force-new-deployment --cluster SDK-Example-CLS
+          aws ecs update-service --service $IMAGE_TAG4-svc --force-new-deployment --cluster SDK-Example-CLS
+          aws ecs update-service --service $IMAGE_TAG5-svc --force-new-deployment --cluster SDK-Example-CLS
+          aws ecs update-service --service $IMAGE_TAG6-svc --force-new-deployment --cluster SDK-Example-CLS
+          aws ecs update-service --service $IMAGE_TAG7-svc --force-new-deployment --cluster SDK-Example-CLS
