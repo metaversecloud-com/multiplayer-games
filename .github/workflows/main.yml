@@ -9,6 +9,11 @@ on:
         required: true
         type: string
         default: 'dev'
+
+concurrency:
+  group: ${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+  
 env:
   REGISTRY: '368076259134.dkr.ecr.us-east-1.amazonaws.com'
   REPOSITORY: 'sdk-example'
@@ -44,14 +49,14 @@ jobs:
           docker build -t $REGISTRY/$REPOSITORY:$IMAGE_TAG  .
           docker push $REGISTRY/$REPOSITORY:$IMAGE_TAG
           
-      - name: Publish
-        run: |
-          aws ecs update-service --service $IMAGE_TAG-svc --force-new-deployment --cluster SDK-Example-CLS
-          aws ecs update-service --service ${IMAGE_TAG}2-svc --force-new-deployment --cluster SDK-Example-CLS
-          aws ecs update-service --service ${IMAGE_TAG}3-svc --force-new-deployment --cluster SDK-Example-CLS
-          aws ecs update-service --service ${IMAGE_TAG}4-svc --force-new-deployment --cluster SDK-Example-CLS
-          aws ecs update-service --service ${IMAGE_TAG}5-svc --force-new-deployment --cluster SDK-Example-CLS
-          aws ecs update-service --service ${IMAGE_TAG}6-svc --force-new-deployment --cluster SDK-Example-CLS
-          aws ecs update-service --service ${IMAGE_TAG}7-svc --force-new-deployment --cluster SDK-Example-CLS
-          aws ecs update-service --service $IMAGE_TAG-topia1-svc --force-new-deployment --cluster SDK-Example-CLS
-          aws ecs update-service --service $IMAGE_TAG-topia2-svc --force-new-deployment --cluster SDK-Example-CLS
+      # - name: Publish
+      #   run: |
+      #     aws ecs update-service --service $IMAGE_TAG-svc --force-new-deployment --cluster SDK-Example-CLS
+      #     aws ecs update-service --service ${IMAGE_TAG}2-svc --force-new-deployment --cluster SDK-Example-CLS
+      #     aws ecs update-service --service ${IMAGE_TAG}3-svc --force-new-deployment --cluster SDK-Example-CLS
+      #     aws ecs update-service --service ${IMAGE_TAG}4-svc --force-new-deployment --cluster SDK-Example-CLS
+      #     aws ecs update-service --service ${IMAGE_TAG}5-svc --force-new-deployment --cluster SDK-Example-CLS
+      #     aws ecs update-service --service ${IMAGE_TAG}6-svc --force-new-deployment --cluster SDK-Example-CLS
+      #     aws ecs update-service --service ${IMAGE_TAG}7-svc --force-new-deployment --cluster SDK-Example-CLS
+      #     aws ecs update-service --service $IMAGE_TAG-topia1-svc --force-new-deployment --cluster SDK-Example-CLS
+      #     aws ecs update-service --service $IMAGE_TAG-topia2-svc --force-new-deployment --cluster SDK-Example-CLS
