@@ -1,18 +1,14 @@
-name: Publish Wiggle
+name: AWS-Deploy-Wiggle-Push-Prod
 
 on:
-  push:
-    branches: [wiggle-deploy]
   workflow_dispatch:
-    inputs:
-      env:
-        required: true
-        type: string
-        default: 'dev'
 env:
   REGISTRY: '368076259134.dkr.ecr.us-east-1.amazonaws.com'
-  REPOSITORY: 'sdk-example'
+  REPOSITORY: 'sdk-prod'
   IMAGE_TAG: 'sdk-wiggle'
+  GCP_PROJECT_ID: "topia-gcp" #${{ secrets.GCP_PROJECT_ID }}
+  GCP_ARTIFACTORY: 'us-west1-docker.pkg.dev'
+  GCP_REPOSITORY: 'sdk-apps-prod'
         
 permissions:
   id-token: write # This is required for requesting the JWT
@@ -20,7 +16,6 @@ permissions:
 jobs:
   Build:
     runs-on: ubuntu-latest
-    environment: ${{ inputs.env || 'dev' }}
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -28,7 +23,7 @@ jobs:
           ref: 'wiggle-deploy'
         
       - name: Set up QEMU
-        uses: docker/setup-qemu-action@v1
+        uses: docker/setup-qemu-action@v2
           
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v2 
@@ -40,12 +35,10 @@ jobs:
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v1
 
-      - name: Build, tag, and push docker image to Amazon ECR
+      - name: Build and  tag
         run: |
-          cd wiggle
           docker build -t $REGISTRY/$REPOSITORY:$IMAGE_TAG  .
-          docker push $REGISTRY/$REPOSITORY:$IMAGE_TAG
           
-      - name: Publish
+      - name: push docker image to Amazon ECR
         run: |
-          aws ecs update-service --service $IMAGE_TAG-svc --force-new-deployment --cluster SDK-Example-CLS
+          docker push $REGISTRY/$REPOSITORY:$IMAGE_TAG
