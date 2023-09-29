@@ -1,0 +1,44 @@
+name: AWS-Deploy-Wiggle-Push-Prod
+
+on:
+  workflow_dispatch:
+env:
+  REGISTRY: '368076259134.dkr.ecr.us-east-1.amazonaws.com'
+  REPOSITORY: 'sdk-prod'
+  IMAGE_TAG: 'sdk-wiggle'
+  GCP_PROJECT_ID: "topia-gcp" #${{ secrets.GCP_PROJECT_ID }}
+  GCP_ARTIFACTORY: 'us-west1-docker.pkg.dev'
+  GCP_REPOSITORY: 'sdk-apps-prod'
+        
+permissions:
+  id-token: write # This is required for requesting the JWT
+  contents: read  # This is required for actions/checkout
+jobs:
+  Build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: 'wiggle-deploy'
+        
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v2
+          
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v2 
+        with:
+          role-to-assume: arn:aws:iam::368076259134:role/github-actions-role
+          aws-region: us-east-1
+          
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v1
+
+      - name: Build and  tag
+        run: |
+          docker build -t $REGISTRY/$REPOSITORY:$IMAGE_TAG  .
+          
+      - name: push docker image to Amazon ECR
+        run: |
+          docker push $REGISTRY/$REPOSITORY:$IMAGE_TAG
