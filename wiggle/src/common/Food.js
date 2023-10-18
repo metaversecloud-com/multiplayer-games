@@ -1,3 +1,4 @@
+"use strict";
 import { DynamicObject } from "@rtsdk/lance-topia";
 
 export default class Food extends DynamicObject {

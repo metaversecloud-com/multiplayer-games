@@ -1,3 +1,5 @@
+"use strict";
+
 import { BaseTypes, DynamicObject } from "@rtsdk/lance-topia";
 
 export default class Wiggle extends DynamicObject {

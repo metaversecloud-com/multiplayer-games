@@ -1,3 +1,5 @@
+"use strict";
+
 import { GameEngine, SimplePhysicsEngine, TwoVector } from "@rtsdk/lance-topia";
 import Wiggle from "./Wiggle";
 import Food from "./Food";
