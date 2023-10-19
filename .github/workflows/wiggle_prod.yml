@@ -37,6 +37,7 @@ jobs:
 
       - name: Build and  tag
         run: |
+          cd wiggle
           docker build -t $REGISTRY/$REPOSITORY:$IMAGE_TAG  .
           
       - name: push docker image to Amazon ECR
